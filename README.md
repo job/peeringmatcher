@@ -15,6 +15,7 @@ Check what IXPs AS5580 and AS8954 have in common:
 -------------------------------------------------
 
         Alice:peering job$ ./peeringmatcher.py 5580 8954
+        Common IXPs according to PeeringDB.net - time of generation: 2012-10-17 10:01:39
         +--------+-------------------------+-----------------------------+
         |  IXP   |  AS8954 - InTouch N.V.  | AS5580 - Atrato IP Networks |
         +--------+-------------------------+-----------------------------+
