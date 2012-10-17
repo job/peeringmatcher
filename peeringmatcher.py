@@ -8,7 +8,7 @@
 # Install Guide:
 #
 # pip install mysql-python
-# pip install prettytable
+# pip install prettytable (version 0.6.1 or later)
 # pip install ipaddr
 #
 # Do not hesitate to send me patches/bugfixes/love ;-)
