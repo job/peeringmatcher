@@ -21,6 +21,9 @@ import socket
 from ipaddr import *
 import MySQLdb
 from prettytable import *
+from time import gmtime , strftime
+
+time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
 def is_valid_ipv4_address(address):
     try:
@@ -127,6 +130,7 @@ def main():
             row.append('\n'.join(peerings[asn][ixp]))
         common_table.add_row(row)
     common_table.hrules = ALL
+    print "Common IXPs according to PeeringDB.net - time of generation: %s" % (time)
     print common_table
 
 if __name__ == '__main__':
