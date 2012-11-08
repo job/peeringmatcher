@@ -78,7 +78,6 @@ def main():
     for asn in asn_list:
         cursor = db.cursor()
         peerings[asn] = {}
-        
         sql_asn_name = "SELECT name FROM peerParticipants WHERE asn = '%s'" % (asn)
         cursor.execute(sql_asn_name)
         try:
@@ -95,7 +94,8 @@ def main():
             if row[0] is None:
                 continue
             ixp_name = row[1]
-            local_ipaddr = row[0].replace('/64','')	
+            local_ipaddr = row[0].strip()
+            local_ipaddr = lcoal_ipaddr.replace('/64','')	
             local_ipaddr = local_ipaddr.replace('/120','')
             local_ipaddr = local_ipaddr.replace('/48','')
             local_ipaddr = local_ipaddr.replace('/22','')
