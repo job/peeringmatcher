@@ -95,7 +95,7 @@ def main():
                 continue
             ixp_name = row[1]
             local_ipaddr = row[0].strip()
-            local_ipaddr = lcoal_ipaddr.replace('/64','')	
+            local_ipaddr = local_ipaddr.replace('/64','')	
             local_ipaddr = local_ipaddr.replace('/120','')
             local_ipaddr = local_ipaddr.replace('/48','')
             local_ipaddr = local_ipaddr.replace('/22','')
