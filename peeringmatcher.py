@@ -5,6 +5,7 @@
 #   Written by Job Snijders <job.snijders@atrato.com>
 #
 # With significant contributions from:
+#
 #       Vanhoutte Jerome <jerome@dev252.org>
 #
 # To the extent possible under law, Job Snijders has waived all copyright
