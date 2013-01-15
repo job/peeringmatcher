@@ -6,7 +6,7 @@
 #
 # With significant contributions from:
 #
-#       Vanhoutte Jerome <jerome@dev252.org>
+#       Jerome Vanhoutte <jerome@dev252.org>
 #
 # To the extent possible under law, Job Snijders has waived all copyright
 # and related or neighboring rights to this piece of code. 
