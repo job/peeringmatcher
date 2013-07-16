@@ -1,11 +1,12 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 # 
-# Peering matcher 0.2 
+# Peering matcher 0.3 
 #
 #   Written by Job Snijders <job.snijders@atrato.com>
 #
 # With significant contributions from:
-#       Vanhoutte Jerome <jerome@dev252.org>
+#
+#       Jerome Vanhoutte <jerome@dev252.org>
 #
 # To the extent possible under law, Job Snijders has waived all copyright
 # and related or neighboring rights to this piece of code. 
@@ -49,7 +50,7 @@ def is_valid_ipv6_address(address):
         return False
 
 def usage():
-    print """Peering Matcher 0.2
+    print """Peering Matcher 0.3
 usage: peeringmatcher.py ASN1 [ ASN2 ] [ ASN3 ] [ etc.. ]
 
     example: ./peeringmatcher.py 5580 16509
@@ -125,12 +126,7 @@ def main():
                 continue
             ixp_name = row[1]
             local_ipaddr = row[0].strip()
-            local_ipaddr = local_ipaddr.replace('/64','')   
-            local_ipaddr = local_ipaddr.replace('/120','')
-            local_ipaddr = local_ipaddr.replace('/48','')
-            local_ipaddr = local_ipaddr.replace('/22','')
-            local_ipaddr = local_ipaddr.replace('/23','')
-            local_ipaddr = local_ipaddr.replace('/24','')
+            local_ipaddr = local_ipaddr.split('/')[0]
             #filter the shit from the database
             if (is_valid_ipv4_address(local_ipaddr)) or (is_valid_ipv6_address(local_ipaddr)):
                 peerings[asn].setdefault(ixp_name, []).append(local_ipaddr)
