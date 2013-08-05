@@ -66,8 +66,7 @@ usage: peeringmatcher.py ASN1 [ ASN2 ] [ ASN3 ] [ etc.. ]
 """
     sys.exit(2)
 
-def main():
-    asn_list = sys.argv[1:]
+def main(asn_list):
     peerings = {}
     asn_names = {}
     counter = {}
@@ -167,4 +166,9 @@ def main():
     print common_table
 
 if __name__ == '__main__':
-    main()
+    import optparse
+    parser = optparse.OptionParser()
+
+    options, args = parser.parse_args()
+
+    main(args)
