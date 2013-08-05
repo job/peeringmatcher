@@ -16,38 +16,45 @@
 #
 # shell$ pip install mysql-python
 # shell$ pip install 'prettytable>0.6.1' # version 0.6.1 or later
-# shell$ pip install ipaddr
 #
 # Do not hesitate to send me patches/bugfixes/love ;-)
 
 default_asn = 5580
 
-import sys
-import re
-import ipaddr 
-import pprint
 import MySQLdb
-from ipaddr import *
+import pprint
+import re
+import socket
+import sys
 from prettytable import *
 from time import *
 
 time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
-# Using the ipaddr library make it easy
-# Used to validate an ip as the db is provision with crappy data
-def is_valid_ipv4_address(address):
-    try:
-        ipaddr.IPv4Address(address)
-        return True
-    except ValueError:
-        return False
 
-def is_valid_ipv6_address(address):
+def _is_ipv4(ip):
+    """ Return true if given arg is a valid IPv4 address
+    """
     try:
-        ipaddr.IPv6Address(address)
-        return True
-    except ValueError: # not a valid address
+        socket.inet_aton(ip)
+    except socket.error:
         return False
+    except exceptions.UnicodeEncodeError:
+        return False
+    return True
+
+
+def _is_ipv6(ip):
+    """ Return true if given arg is a valid IPv6 address
+    """
+    try:
+        socket.inet_pton(socket.AF_INET6, ip)
+    except socket.error, UnicodeEncodeError:
+        return False
+    except exceptions.UnicodeEncodeError:
+        return False
+    return True
+
 
 def usage():
     print """Peering Matcher 0.3
@@ -131,8 +138,9 @@ def main(asn_list):
             ixp_name = row[1]
             local_ipaddr = row[0].strip()
             local_ipaddr = local_ipaddr.split('/')[0]
-            #filter the shit from the database
-            if (is_valid_ipv4_address(local_ipaddr)) or (is_valid_ipv6_address(local_ipaddr)):
+            # Peeringdb is unfortunately filled with crappy IP data. Filter the
+            # shit from the database.
+            if _is_ipv4(local_ipaddr) or _is_ipv6(local_ipaddr):
                 peerings[asn].setdefault(ixp_name, []).append(local_ipaddr)
     
     db.close()
