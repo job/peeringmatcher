@@ -85,7 +85,7 @@ def main(asn_list):
         try:
             asn = int(asn)
         except:
-            print 'Error: Please enter a valid ASN: %s' % (asn)
+            print >> sys.stderr, 'Error: Please enter a valid ASN: %s' % (asn)
             usage()
     
     #convert string to integer to be used after as key 
@@ -109,7 +109,7 @@ def main(asn_list):
         try:
             name = cursor.fetchone()[0]
         except:
-            print "AS%s does not have a PeeringDB entry :-(" % (asn)
+            print >> sys.stderr, "AS%s does not have a PeeringDB entry :-(" % (asn)
             sys.exit(2)
         
         asn_names[asn] = name
@@ -146,7 +146,7 @@ def main(asn_list):
             common_ixps.append(ixp)
 
     if len(common_ixps) == 0:
-        print "No common IXPs found in PeeringDB.net database :-("
+        print >> sys.stderr, "No common IXPs found in PeeringDB.net database :-("
         sys.exit(2)
 
     # now magic ascii art
