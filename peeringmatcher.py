@@ -100,11 +100,13 @@ def main():
         peerings[asn] = {}
 
         # Fetch the ASN list 
-        sql_asn_name = "select DISTINCT participant.name from peerParticipantsPublics peer \
-        LEFT JOIN peerParticipants participant ON participant.id = peer.participant_id \
-        WHERE peer.local_asn='%s'" % (asn)
+        sql_asn_name = """
+            SELECT DISTINCT participant.name
+            FROM peerParticipantsPublics peer
+            LEFT JOIN peerParticipants participant ON participant.id = peer.participant_id
+            WHERE peer.local_asn=%s """
 
-        cursor.execute(sql_asn_name)
+        cursor.execute(sql_asn_name, [asn])
         try:
             name = cursor.fetchone()[0]
         except:
@@ -114,11 +116,14 @@ def main():
         asn_names[asn] = name
 
         # Fetch the peering information for each AS
-        sql_peering = "select peer.local_ipaddr, public.name from peerParticipantsPublics peer \
-        LEFT JOIN mgmtPublics public ON peer.public_id=public.id \
-        WHERE peer.local_asn=%s ORDER by public.name;" % (asn)
+        sql_peering = """
+            SELECT  peer.local_ipaddr,
+                    public.name
+            FROM peerParticipantsPublics peer
+            LEFT JOIN mgmtPublics public ON peer.public_id=public.id
+            WHERE peer.local_asn=%s ORDER by public.name"""
 
-        cursor.execute(sql_peering)
+        cursor.execute(sql_peering, [asn])
         results = cursor.fetchall()
     
         for row in results:
