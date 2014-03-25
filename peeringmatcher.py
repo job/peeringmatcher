@@ -126,10 +126,10 @@ class PeeringMatcher:
                 JOIN peerParticipants peer ON ppp.participant_id=peer.id
                 WHERE peer.asn IN (%(asns)s)
                 GROUP BY ppp.facility_id
-                HAVING COUNT(1) > 1
+                HAVING COUNT(1) >= %(num_asns)s
                 )
             ORDER BY facility.name, ppp.participant_id
-            """ % { 'asns': ', '.join(map(str, asn_list)) }
+            """ % { 'num_asns': len(asn_list), 'asns': ', '.join(map(str, asn_list)) }
         cursor.execute(sql_pops)
 
         pops = {}
@@ -178,10 +178,10 @@ class PeeringMatcher:
                         WHERE peer.asn IN (%(asns)s)
                         ) AS a
                     GROUP BY public_id
-                    HAVING COUNT(1) > 1
+                    HAVING COUNT(1) >= %(num_asns)s
                 )
             ORDER BY public.name, peer.asn
-            """ % { 'asns': ', '.join(map(str, asn_list)) }
+            """ % { 'num_asns': len(asn_list), 'asns': ', '.join(map(str, asn_list)) }
         cursor.execute(sql_ixes)
 
         ixes = {}
