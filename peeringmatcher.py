@@ -71,7 +71,7 @@ usage: peeringmatcher.py ASN1 [ ASN2 ] [ ASN3 ] [ etc.. ]
         Job Snijders <job.snijders@atrato.com> 
         Jerome Vanhoutte <jerome@dev252.org>
 """
-    sys.exit(2)
+    sys.exit(1)
 
 class PeeringMatcher:
     def __init__(self):
@@ -205,12 +205,6 @@ class PeeringMatcher:
 
 
 def main(asn_list):
-    peerings = {}
-    facilities = {}
-    asn_names = {}
-    common_ixps = []
-    common_pops = []
-
     # If no ASN is defined on the commandline, the default_asn is used
     if (default_asn not in asn_list) and (len(asn_list) == 1):
         asn_list.append(default_asn)
