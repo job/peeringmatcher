@@ -155,8 +155,54 @@ class PeeringMatcher:
         return pops
 
 
-    def get_common_ixs(self, asn_list):
-        pass
+    def get_common_ixes(self, asn_list):
+        """ Return a dict with common IXes between networks
+        """
+        cursor = self.db.cursor()
+
+        # Fetch common facilities
+        sql_ixes = """
+            SELECT public.name,
+                peer.asn,
+                ppp.local_ipaddr
+            FROM peerParticipantsPublics ppp
+            JOIN peerParticipants peer ON ppp.participant_id=peer.id
+            JOIN mgmtPublics public ON ppp.public_id = public.id
+            WHERE peer.asn IN (%(asns)s)
+                AND public.id IN (
+                    SELECT public_id
+                    FROM (
+                        SELECT DISTINCT ppp.public_id, peer.asn
+                        FROM peerParticipantsPublics ppp
+                        JOIN peerParticipants peer ON ppp.participant_id=peer.id
+                        WHERE peer.asn IN (%(asns)s)
+                        ) AS a
+                    GROUP BY public_id
+                    HAVING COUNT(1) > 1
+                )
+            ORDER BY public.name, peer.asn
+            """ % { 'asns': ', '.join(map(str, asn_list)) }
+        cursor.execute(sql_ixes)
+
+        ixes = {}
+        for row in cursor.fetchall():
+            ix_name = row[0]
+            asn = row[1]
+            local_ipaddr = row[2].strip().split('/')[0]
+
+            if ix_name not in ixes:
+                ixes[ix_name] = {}
+            if asn not in ixes[ix_name]:
+                ixes[ix_name][asn] = []
+
+            # Peeringdb is unfortunately filled with crappy IP data. Filter the
+            # shit from the database.
+            if _is_ipv4(local_ipaddr) or _is_ipv6(local_ipaddr):
+                ixes[ix_name][asn].append(local_ipaddr)
+
+        return ixes
+
+
 
 def main(asn_list):
     peerings = {}
@@ -169,94 +215,37 @@ def main(asn_list):
     if (default_asn not in asn_list) and (len(asn_list) == 1):
         asn_list.append(default_asn)
 
-    # setup connection to peeringdb.net
-    db = MySQLdb.connect("peeringdb.net", "peeringdb", "peeringdb", "Peering")
-    cursor = db.cursor()
-
     pm = PeeringMatcher()
     asns = pm.get_asn_info(asn_list)
 
-    for asn in asn_list:
-        cursor = db.cursor()
-        peerings[asn] = {}
-        facilities[asn] = {}
-
-        # Fetch the IX peering information for each AS
-        sql_peering = """
-            SELECT  peer.local_ipaddr,
-                    public.name
-            FROM peerParticipantsPublics peer
-            LEFT JOIN mgmtPublics public ON peer.public_id=public.id
-            WHERE peer.local_asn=%s ORDER BY public.name"""
-
-        cursor.execute(sql_peering, [asn])
-        results = cursor.fetchall()
-    
-        for row in results:
-            if row[0] is None:
-                continue
-            ixp_name = row[1]
-            local_ipaddr = row[0].strip()
-            local_ipaddr = local_ipaddr.split('/')[0]
-            # Peeringdb is unfortunately filled with crappy IP data. Filter the
-            # shit from the database.
-            if _is_ipv4(local_ipaddr) or _is_ipv6(local_ipaddr):
-                peerings[asn].setdefault(ixp_name, []).append(local_ipaddr)
-
-    db.close()
-
-    counter = {}
-    for ixdict in peerings.values():
-        for ixname in ixdict:
-            counter[ixname] = counter.get(ixname, 0) + 1
-
-    for ixp in counter:
-        if counter[ixp] == len(asns):
-            common_ixps.append(ixp)
-
-    counter = {}
-    for popdict in facilities.values():
-        for popname in popdict:
-            counter[popname] = counter.get(popname, 0) + 1
-
-    for pop in counter:
-        if counter[pop] == len(asns):
-            common_pops.append(pop)
-
-    if len(common_ixps) == 0 and len(common_pops) == 0:
-        print >> sys.stderr, "No common IXPs or facilities found in PeeringDB.net database :-("
-        sys.exit(2)
-
-    # now magic ascii art
+    # IXPs
+    ixes = pm.get_common_ixes(asn_list)
     table_header = ['IXP']
     for asn in asns:
-        name = "AS%s - %s" % (int(asn), asns[asn]['name'])
-        table_header.append(name) 
+        table_header.append("AS%s - %s" % (int(asn), asns[asn]['name']))
     common_table = PrettyTable(table_header)
 
-    for ixp in common_ixps:
-        row = [ixp]
-        for asn in asns:
-            row.append('\n'.join(peerings[asn][ixp]))
+    for ix_name in sorted(ixes):
+        row = [ix_name]
+        for asn in sorted(asns):
+            row.append('\n'.join(ixes[ix_name][asn]))
         common_table.add_row(row)
 
     common_table.hrules = ALL
     print "Common IXPs according to PeeringDB.net - time of generation: %s" % (time)
     print common_table
-
     print ""
 
+    # PoPs
     pops = pm.get_common_pops(asn_list)
-
     table_header = ['Facility']
-    # now magic ascii art
     for asn in asns:
         table_header.append("AS%s - %s" % (int(asn), asns[asn]['name']))
     common_table = PrettyTable(table_header)
 
-    for pop_name in pops:
+    for pop_name in sorted(pops):
         row = [pop_name]
-        for asn in asns:
+        for asn in sorted(asns):
             row.append('\n'.join(pops[pop_name][asn]))
         common_table.add_row(row)
 
