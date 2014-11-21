@@ -1,15 +1,15 @@
 #!/usr/bin/env python
-# 
-# Peering matcher 0.3 
 #
-#   Written by Job Snijders <job.snijders@atrato.com>
+# Peering matcher 0.3
+#
+#   Written by Job Snijders <job@instituut.net>
 #
 # With significant contributions from:
 #
 #       Jerome Vanhoutte <jerome@dev252.org>
 #
 # To the extent possible under law, Job Snijders has waived all copyright
-# and related or neighboring rights to this piece of code. 
+# and related or neighboring rights to this piece of code.
 # This work is published from: The Netherlands.
 #
 # Install Guide:
@@ -19,15 +19,20 @@
 #
 # Do not hesitate to send me patches/bugfixes/love ;-)
 
-default_asn = 5580
+default_asn = 8283
 
-import MySQLdb
-import pprint
-import re
-import socket
 import sys
+from time import strftime, gmtime
+import socket
+
+try:
+    import MySQLdb
+except ImportError:
+    print "ERROR: MySQLdb not found"
+    print "HINT: sudo pip install mysql-python"
+    sys.exit(2)
+
 from prettytable import *
-from time import *
 
 time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
@@ -60,7 +65,7 @@ def usage():
     print """Peering Matcher 0.3
 usage: peeringmatcher.py ASN1 [ ASN2 ] [ ASN3 ] [ etc.. ]
 
-    example: ./peeringmatcher.py 5580 16509
+    example: ./peeringmatcher.py 8283 16509
 
     Peeringmatcher.py will do a lookup against PeeringDB.net.
     In case a single ASN is given as an argument, the program will match
@@ -68,7 +73,7 @@ usage: peeringmatcher.py ASN1 [ ASN2 ] [ ASN3 ] [ etc.. ]
 
     This is Public Domain code, with contributions from:
 
-        Job Snijders <job.snijders@atrato.com> 
+        Job Snijders <job@instituut.net>
         Jerome Vanhoutte <jerome@dev252.org>
 """
     sys.exit(1)
@@ -221,7 +226,7 @@ def main(asn_list):
 
     for ix_name in sorted(ixes):
         row = [ix_name]
-        for asn in sorted(asns):
+        for asn in asns:
             row.append('\n'.join(ixes[ix_name][asn]))
         common_table.add_row(row)
 
