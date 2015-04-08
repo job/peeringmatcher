@@ -75,9 +75,7 @@ def _lazy_get(path):
     """ Lazily get content from the API, parse the JSON and return a dictionary
     """
     try:
-        output = urllib2.urlopen(base_url + '/' + path)
-        if output is not None:
-            return json.loads(output.read())
+        return json.loads(urllib2.urlopen(base_url + '/' + path).read())
     except:
         return {}
 
