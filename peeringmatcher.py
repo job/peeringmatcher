@@ -109,9 +109,9 @@ def main(asn_list):
         if len(ixps[ix_lan]) == len(asn_list):
             row      = []
             ix_name  = 'UNKNOWN'
+            # Dont bother caching this since we only use it once
             try:
-                # Should be ixlan/s
-                ix_name = _lazy_get('ix/%s' % ix_lan)['data'][0]['name']
+                ix_name = _lazy_get('ix/%s' % _lazy_get('ixlan/%s' % ix_lan)['data'][0]['ix'])['data'][0]['name']
             except:
                 pass
             row.append(ix_name)
