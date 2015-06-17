@@ -81,7 +81,7 @@ usage: peeringmatcher.py ASN1 [ ASN2 ] [ ASN3 ] [ etc.. ]
 class PeeringMatcher:
     def __init__(self):
         # setup connection to peeringdb.net
-        self.db = MySQLdb.connect("peeringdb.net", "peeringdb", "peeringdb", "Peering")
+        self.db = MySQLdb.connect("peeringdb.com", "peeringdb", "peeringdb", "Peering")
 
     def get_asn_info(self, asn_list):
         """ Get ASN info and return as dict
