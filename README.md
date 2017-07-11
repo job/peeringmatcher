@@ -1,6 +1,18 @@
 Peeringmatcher
 ==============
 
+NOTICE: PeerFinder superseded this tool
+=======================================
+
+This tool has been superseded by https://github.com/rucarrol/PeerFinder
+
+OLD README:
+===========
+
+Example
+-------
+
+
         alice:peering job$ ./peeringmatcher.py
         Peering Matcher 0.1
         usage: peeringmatcher.py ASN1 [ ASN2 ] [ ASN3 ] [ etc.. ]
